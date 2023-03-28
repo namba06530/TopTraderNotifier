@@ -1,0 +1,50 @@
+import threading
+from business.entities.monitor_market import *
+from service.my_telegram_bot import *
+import talib
+from datetime import datetime
+import requests
+
+now = datetime.now()
+
+# Empêche la vérification SSL en environement de DEV
+httpClient = requests.Session()
+httpClient.verify = False
+
+if __name__ == '__main__':
+    # Add command handlers
+    dispatcher.add_handler(CommandHandler("start", start))
+    dispatcher.add_handler(CommandHandler("subscribe", subscribe))
+    dispatcher.add_handler(CommandHandler("unsubscribe", unsubscribe))
+
+    # Start the Telegram bot
+    updater.start_polling()
+
+    # Print the list of subscribed chat IDs
+    print('----------------------------------------')
+    print("-----TOP TRADER NOTIFIER V0.1_ALPHA-----")
+    print('----------------------------------------')
+    print("Bot lancé le: ", now.strftime("%d/%m/%Y %H:%M:%S"))
+    print(f"Nombre d'abonné(s):", len(subscribed_chat_ids))
+
+    # List of trading pairs to monitor
+    pairs_to_monitor = config['pairs_to_monitor']
+    print(f"Nombre de paire(s) monitorée(s):", len(pairs_to_monitor))
+
+    # Interval de vérification du prix en secondes (unité temps)
+    interval = "5m"
+    print(f"Intervalle de Temps: {interval}")
+    print('----------------------------------------')
+    print()
+
+    # Initialize TA-Lib
+    ta_func = talib.SMA
+    ta_ma_args = (100, 130)
+    ta_ema_args = (35, 55)
+
+    # Monitor MA 100 130 and EMA 35 55 Crossover
+    monitor_thread = threading.Thread(target=monitor_ma_crossover,
+                                      args=(
+                                          pairs_to_monitor, interval, ta_func, ta_ma_args, ta_ema_args, dispatcher))
+
+    monitor_thread.start()
