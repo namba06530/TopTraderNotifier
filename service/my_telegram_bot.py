@@ -1,4 +1,4 @@
-from telegram import Update, ForceReply, bot
+from telegram import Update, ForceReply, bot, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackContext
 import json
 import atexit
@@ -30,8 +30,10 @@ def start(update: Update, context: CallbackContext) -> None:
     user = update.effective_user
     context.bot.send_message(
         chat_id=update.effective_chat.id,
-        text=f"Hello {user.first_name} ! Welcome to the Top Traders Notification Bot!"
-             f" To start receiving alerts, type /subscribe. To unsubscribe, type /unsubscribe. Happy trading!")
+        text=f"Hello {user.first_name}! \nThank you for connecting with the Top Traders Notification Bot.\n\n "
+             f"Please note that the bot is currently in its development and testing phase. "
+             f"You can start receiving alerts by typing /subscribe. "
+             f"To unsubscribe, type /unsubscribe. \nThank you for your patience and happy trading!")
 
 
 def subscribe(update: Update, context: CallbackContext) -> None:
@@ -40,8 +42,8 @@ def subscribe(update: Update, context: CallbackContext) -> None:
         update.message.reply_text("You have already subscribed to TopTraderNotifier!")
     else:
         subscribed_chat_ids.add(chat_id)
-        update.message.reply_text(
-            "Thank you for subscribing to TopTraderNotifier! You will now receive notifications of important market events.")
+        update.message.reply_text("Thank you for subscribing to TopTraderNotifier !\n\n"
+                                  "You will now receive notifications of important market evants.")
 
 
 def unsubscribe(update: Update, context: CallbackContext) -> None:

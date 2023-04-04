@@ -7,7 +7,7 @@ import requests
 
 now = datetime.now()
 
-# Empêche la vérification SSL en environement de DEV
+# Set SSL verification
 httpClient = requests.Session()
 httpClient.verify = False
 
@@ -31,8 +31,10 @@ if __name__ == '__main__':
     pairs_to_monitor = config['pairs_to_monitor']
     print(f"Nombre de paire(s) monitorée(s):", len(pairs_to_monitor))
 
-    # Interval de vérification du prix en secondes (unité temps)
+    # Unit Time
     interval = "5m"
+    # Time to wait for refresh
+    # seconds = 60
     print(f"Intervalle de Temps: {interval}")
     print('----------------------------------------')
     print()
