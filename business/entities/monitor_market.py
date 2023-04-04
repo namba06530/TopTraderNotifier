@@ -118,6 +118,7 @@ def monitor_ma_crossover(pairs, interval, ma_func, ma_args, ema_args, dispatcher
                                     buy_message = signal_message(pair, 'buy', last_candle, entry_price,
                                                                  stop_loss, tp1, tp2)
                                     print(Fore.GREEN + buy_message)
+                                    print(Style.RESET_ALL)
                                     send_message_to_subscribed_users(dispatcher, buy_message)
 
                         if last_positions[pair]['ma_position'] == 'below':
@@ -130,6 +131,7 @@ def monitor_ma_crossover(pairs, interval, ma_func, ma_args, ema_args, dispatcher
                                     sell_message = signal_message(pair, 'sell', last_candle, entry_price,
                                                                   stop_loss, tp1, tp2)
                                     print(Fore.RED + sell_message)
+                                    print(Style.RESET_ALL)
                                     send_message_to_subscribed_users(dispatcher, sell_message)
                     else:
                         print(

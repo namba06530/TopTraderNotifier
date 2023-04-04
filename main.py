@@ -1,15 +1,20 @@
 import threading
-from business.entities.monitor_market import *
-from service.my_telegram_bot import *
+from business.entities.monitor_market import monitor_ma_crossover
+from service.my_telegram_bot import dispatcher, CommandHandler, start, subscribe, unsubscribe, updater, subscribed_chat_ids
 import talib
 from datetime import datetime
 import requests
+import json
 
 now = datetime.now()
 
 # Set SSL verification
 httpClient = requests.Session()
 httpClient.verify = False
+
+# Load configuration
+with open("./config.json", 'r') as f:
+    config = json.load(f)
 
 if __name__ == '__main__':
     # Add command handlers
@@ -22,7 +27,7 @@ if __name__ == '__main__':
 
     # Print the list of subscribed chat IDs
     print('----------------------------------------')
-    print("-----TOP TRADER NOTIFIER V0.1_ALPHA-----")
+    print("-----TOP TRADER NOTIFIER V0.2_BETA-----")
     print('----------------------------------------')
     print("Bot lancé le: ", now.strftime("%d/%m/%Y %H:%M:%S"))
     print(f"Nombre d'abonné(s):", len(subscribed_chat_ids))

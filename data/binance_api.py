@@ -1,8 +1,6 @@
 import time
-
 from binance.client import Client as BinanceClient
 import json
-
 from binance.exceptions import BinanceAPIException
 
 # Load configuration

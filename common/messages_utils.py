@@ -13,7 +13,7 @@ def signal_message(pair, signal_type, candle, entry_price, stop_loss, tp1, tp2):
 
     if signal_type == 'buy':
         message = f"{datetime.fromtimestamp(candle['timestamp'] / 1000).strftime('%Y-%m-%d %H:%M:%S')}\n" \
-                  f"{pair} BUY signal detected ! " \
+                  f"{pair} BUY signal detected !\n " \
                   f"Entry Price = {entry_price}\n" \
                   f"Stop Loss = {stop_loss}\n" \
                   f"TP1 = {tp1}\n" \
@@ -21,7 +21,7 @@ def signal_message(pair, signal_type, candle, entry_price, stop_loss, tp1, tp2):
 
     elif signal_type == 'sell':
         message = f"{datetime.fromtimestamp(candle['timestamp'] / 1000).strftime('%Y-%m-%d %H:%M:%S')}\n" \
-                  f"{pair} SELL signal detected ! " \
+                  f"{pair} SELL signal detected !\n " \
                   f"Entry Price = {entry_price}\n" \
                   f"Stop Loss = {stop_loss}\n" \
                   f"TP1 = {tp1}\n" \
