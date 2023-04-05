@@ -18,21 +18,19 @@ def calculate_sell_entry_price(last_ma1, last_ma2, last_candle):
     return entry_price
 
 
-def calculate_sell_stop_loss(last_ma1, last_ma2, last_ema1, last_ema2, highs):
-    # Get the last highest high
-    highest_high = max(highs[:-1])
+def calculate_sell_stop_loss(ma1, ma2, ema1, ema2, highs):
+    # Find the index of the last candle where high is above all MAs and EMAs
+    last_candle_above_mas_emas = -1
+    for i in range(len(highs) - 1, -1, -1):  # We start from the last element (the most recent candle)
+        if highs[i] > ma1[i] and highs[i] > ma2[i] and highs[i] > ema1[i] and highs[i] > ema2[i]:
+            last_candle_above_mas_emas = i
+            break
 
-    # Create a list of all the values to search for the last point below
-    values = [highest_high, last_ma1, last_ma2, last_ema1, last_ema2]
+    # If there is no such candle, return None
+    if last_candle_above_mas_emas == -1:
+        return None
 
-    # Reverse the list to search from the end
-    values.reverse()
-
-    # Search for the last point above all the MAs and EMAs
-    stop_loss = highest_high
-    for value in values:
-        if value > stop_loss:
-            stop_loss = value
+    stop_loss = highs[last_candle_above_mas_emas]
 
     # Set the stop loss slightly above the last point above the MAs and EMAs
     stop_loss = stop_loss + (stop_loss * 0.005)

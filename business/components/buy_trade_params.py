@@ -17,21 +17,19 @@ def calculate_buy_entry_price(last_ma1, last_ma2, last_candle):
     return entry_price
 
 
-def calculate_buy_stop_loss(last_ma1, last_ma2, last_ema1, last_ema2, lows):
-    # Get the last lowest low
-    lowest_low = min(lows[:-1])
+def calculate_buy_stop_loss(ma1, ma2, ema1, ema2, lows):
+    # Find the index of the last candle where low is below all MAs and EMAs
+    last_candle_below_mas_emas = -1
+    for i in range(len(lows) - 1, -1, -1):  # We start from the last element (the most recent candle)
+        if lows[i] < ma1[i] and lows[i] < ma2[i] and lows[i] < ema1[i] and lows[i] < ema2[i]:
+            last_candle_below_mas_emas = i
+            break
 
-    # Create a list of all the values to search for the last point below
-    values = [lowest_low, last_ma1, last_ma2, last_ema1, last_ema2]
+    # If there is no such candle, return None
+    if last_candle_below_mas_emas == -1:
+        return None
 
-    # Reverse the list to search from the end
-    values.reverse()
-
-    # Search for the last point below all the MAs and EMAs
-    stop_loss = lowest_low
-    for value in values:
-        if value < stop_loss:
-            stop_loss = value
+    stop_loss = lows[last_candle_below_mas_emas]
 
     # Set the stop loss slightly below the last point below the MAs and EMAs
     stop_loss = stop_loss - (stop_loss * 0.005)

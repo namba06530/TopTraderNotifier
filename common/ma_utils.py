@@ -27,7 +27,8 @@ def calculate_ma(closes, ma_func, ma_args, ema_args):
 
     last_mas = {'ma1': last_ma1, 'ma2': last_ma2}
 
-    return start_ma1, start_ma2, start_ema1, start_ema2, last_ma1, last_ma2, last_ema1, last_ema2, prev_ema1, prev_ema2
+    return start_ma1, start_ma2, start_ema1, start_ema2, last_ma1, last_ma2, last_ema1, last_ema2, prev_ema1, prev_ema2,\
+        ma1, ma2, ema1, ema2
 
 
 def get_ma_position(candle, mas):
@@ -119,8 +120,8 @@ def check_ma_conditions(pair, last_mas):
 
 def get_last_candle_and_ma(symbol, interval, ma_func, ma_args, ema_args):
     start_candle, last_candle, opens, closes, highs, lows = get_candles_data(symbol, interval)
-    start_ma1, start_ma2, start_ema1, start_ema2, last_ma1, last_ma2, last_ema1, last_ema2, prev_ema1, prev_ema2 = \
-        calculate_ma(closes, ma_func, ma_args, ema_args)
+    start_ma1, start_ma2, start_ema1, start_ema2, last_ma1, last_ma2, last_ema1, last_ema2, prev_ema1, prev_ema2, ma1, \
+        ma2, ema1, ema2 = calculate_ma(closes, ma_func, ma_args, ema_args)
 
     # Calculate Bollinger Bands for the last two candles
     prev_upper_band, prev_middle_band, prev_lower_band = calculate_bollinger_bands(closes[:-1], period=130, std_dev=2)
@@ -131,4 +132,4 @@ def get_last_candle_and_ma(symbol, interval, ma_func, ma_args, ema_args):
     last_band_width = calculate_bollinger_band_width(last_upper_band, last_lower_band)
 
     return start_candle, last_candle, opens, closes, highs, lows, start_ma1, start_ma2, start_ema1, start_ema2, last_ma1, last_ma2, \
-        last_ema1, last_ema2, prev_ema1, prev_ema2, prev_band_width, last_band_width
+        last_ema1, last_ema2, prev_ema1, prev_ema2, prev_band_width, last_band_width, ma1, ma2, ema1, ema2

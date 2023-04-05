@@ -29,7 +29,7 @@ def monitor_ma_crossover(pairs, interval, ma_func, ma_args, ema_args, dispatcher
     for pair in pairs:
         # Get start candle for the first loop
         start_candle, last_candle, opens, closes, highs, lows, start_ma1, start_ma2, start_ema1, start_ema2, last_ma1, last_ma2, last_ema1, \
-            last_ema2, prev_ema1, prev_ema2, prev_band_width, last_band_width = get_last_candle_and_ma(pair, interval, ma_func, ma_args, ema_args)
+            last_ema2, prev_ema1, prev_ema2, prev_band_width, last_band_width, ma1, ma2, ema1, ema2 = get_last_candle_and_ma(pair, interval, ma_func, ma_args, ema_args)
 
         start_candles[pair] = start_candle
         start_mas[pair] = {'ma1': start_ma1, 'ma2': start_ma2}
@@ -55,7 +55,7 @@ def monitor_ma_crossover(pairs, interval, ma_func, ma_args, ema_args, dispatcher
     while True:
         for pair in pairs:
             start_candle, last_candle, opens, closes, highs, lows, start_ma1, start_ma2, start_ema1, start_ema2, last_ma1, last_ma2, last_ema1, \
-                last_ema2, prev_ema1, prev_ema2, prev_band_width, last_band_width = get_last_candle_and_ma(pair, interval, ma_func, ma_args, ema_args)
+                last_ema2, prev_ema1, prev_ema2, prev_band_width, last_band_width, ma1, ma2, ema1, ema2 = get_last_candle_and_ma(pair, interval, ma_func, ma_args, ema_args)
 
             if last_candles[pair]['timestamp'] != last_candle['timestamp']:
                 # print(f"timestamp last_candle {pair} = {last_candle['timestamp']}")
@@ -112,7 +112,7 @@ def monitor_ma_crossover(pairs, interval, ma_func, ma_args, ema_args, dispatcher
                             if ema_below_ma:
                                 if ema_close or ema_crossed:
                                     entry_price = calculate_buy_entry_price(last_ma1, last_ma2, last_candle)
-                                    stop_loss = calculate_buy_stop_loss(last_ma1, last_ma2, last_ema1, last_ema2, lows)
+                                    stop_loss = calculate_buy_stop_loss(ma1, ma2, ema1, ema2, lows)
                                     tp1 = calculate_buy_tp1(entry_price, stop_loss)
                                     tp2 = calculate_buy_tp2(closes, period=130, std_dev=2)
                                     buy_message = signal_message(pair, 'buy', last_candle, entry_price,
@@ -125,7 +125,7 @@ def monitor_ma_crossover(pairs, interval, ma_func, ma_args, ema_args, dispatcher
                             if ema_above_ma:
                                 if ema_close or ema_crossed:
                                     entry_price = calculate_sell_entry_price(last_ma1, last_ma2, last_candle)
-                                    stop_loss = calculate_sell_stop_loss(last_ma1, last_ma2, last_ema1, last_ema2, highs)
+                                    stop_loss = calculate_sell_stop_loss(ma1, ma2, ema1, ema2, highs)
                                     tp1 = calculate_sell_tp1(entry_price, stop_loss)
                                     tp2 = calculate_sell_tp2(closes, period=130, std_dev=2)
                                     sell_message = signal_message(pair, 'sell', last_candle, entry_price,
