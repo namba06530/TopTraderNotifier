@@ -1,4 +1,6 @@
 import time
+
+from common.macd_utils import calculate_macd
 from service.my_telegram_bot import *
 from common.utils import interval_to_seconds
 from common.ma_utils import get_ma_position, update_ma_ema_positions, get_last_candle_and_ma, check_ema_conditions, \
@@ -29,7 +31,8 @@ def monitor_ma_crossover(pairs, interval, ma_func, ma_args, ema_args, dispatcher
     for pair in pairs:
         # Get start candle for the first loop
         start_candle, last_candle, opens, closes, highs, lows, start_ma1, start_ma2, start_ema1, start_ema2, last_ma1, last_ma2, last_ema1, \
-            last_ema2, prev_ema1, prev_ema2, prev_band_width, last_band_width, ma1, ma2, ema1, ema2 = get_last_candle_and_ma(pair, interval, ma_func, ma_args, ema_args)
+            last_ema2, prev_ema1, prev_ema2, prev_band_width, last_band_width, ma1, ma2, ema1, ema2 = get_last_candle_and_ma(
+            pair, interval, ma_func, ma_args, ema_args)
 
         start_candles[pair] = start_candle
         start_mas[pair] = {'ma1': start_ma1, 'ma2': start_ma2}
@@ -55,7 +58,8 @@ def monitor_ma_crossover(pairs, interval, ma_func, ma_args, ema_args, dispatcher
     while True:
         for pair in pairs:
             start_candle, last_candle, opens, closes, highs, lows, start_ma1, start_ma2, start_ema1, start_ema2, last_ma1, last_ma2, last_ema1, \
-                last_ema2, prev_ema1, prev_ema2, prev_band_width, last_band_width, ma1, ma2, ema1, ema2 = get_last_candle_and_ma(pair, interval, ma_func, ma_args, ema_args)
+                last_ema2, prev_ema1, prev_ema2, prev_band_width, last_band_width, ma1, ma2, ema1, ema2 = get_last_candle_and_ma(
+                pair, interval, ma_func, ma_args, ema_args)
 
             if last_candles[pair]['timestamp'] != last_candle['timestamp']:
                 # print(f"timestamp last_candle {pair} = {last_candle['timestamp']}")
@@ -67,6 +71,13 @@ def monitor_ma_crossover(pairs, interval, ma_func, ma_args, ema_args, dispatcher
                 last_emas[pair] = {'ema1': last_ema1, 'ema1_prev': prev_ema1, 'ema2': last_ema2, 'ema2_prev': prev_ema2}
 
                 last_band_widths[pair] = {'prev_band_width': prev_band_width, 'last_band_width': last_band_width}
+
+                # Calculate the new MACD values
+                macd, macd_signal, macd_hist = calculate_macd(closes)
+
+                # Check if MACD conditions are met
+                macd_cross_above = macd[-1] > macd_signal[-1] and macd[-2] <= macd_signal[-2]
+                macd_cross_below = macd[-1] < macd_signal[-1] and macd[-2] >= macd_signal[-2]
 
                 # Compute the position of the last candle with respect to the MAs
                 # Check if last candle close is above or below MAs
@@ -108,7 +119,7 @@ def monitor_ma_crossover(pairs, interval, ma_func, ma_args, ema_args, dispatcher
                             f"{pair} EMAs Close: {ema_close}, EMAs Crossed: {ema_crossed}, "
                             f"EMAs Position: {ema_position}, EMAs Below: {ema_below_ma}, EMAs Above: {ema_above_ma}")
 
-                        if last_positions[pair]['ma_position'] == 'above':
+                        if last_positions[pair]['ma_position'] == 'above' and macd_cross_above:
                             if ema_below_ma:
                                 if ema_close or ema_crossed:
                                     entry_price = calculate_buy_entry_price(last_ma1, last_ma2, last_candle)
@@ -121,7 +132,7 @@ def monitor_ma_crossover(pairs, interval, ma_func, ma_args, ema_args, dispatcher
                                     print(Style.RESET_ALL)
                                     send_message_to_subscribed_users(dispatcher, buy_message)
 
-                        if last_positions[pair]['ma_position'] == 'below':
+                        if last_positions[pair]['ma_position'] == 'below' and macd_cross_below:
                             if ema_above_ma:
                                 if ema_close or ema_crossed:
                                     entry_price = calculate_sell_entry_price(last_ma1, last_ma2, last_candle)
@@ -133,6 +144,7 @@ def monitor_ma_crossover(pairs, interval, ma_func, ma_args, ema_args, dispatcher
                                     print(Fore.RED + sell_message)
                                     print(Style.RESET_ALL)
                                     send_message_to_subscribed_users(dispatcher, sell_message)
+
                     else:
                         print(
                             f"{datetime.fromtimestamp(last_candle['timestamp'] / 1000).strftime('%Y-%m-%d %H:%M:%S')}: "
