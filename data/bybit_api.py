@@ -1,15 +1,15 @@
 import requests
-import json
 import time
 import hmac
 import hashlib
+import os
 
 # Load configuration
-with open("./config.json", 'r') as f:
-    config = json.load(f)
+bybit_fictif_api_key = os.environ['BYBIT_FICTIF_API_KEY']
+bybit_fictif_api_secret = os.environ['BYBIT_FICTIF_API_SECRET']
 
-api_key = config['bybit_fictif_api_key']
-api_secret = config['bybit_fictif_api_secret']
+api_key = bybit_fictif_api_key
+api_secret = bybit_fictif_api_secret
 
 httpClient = requests.Session()
 recv_window = str(5000)

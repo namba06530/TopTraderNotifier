@@ -1,14 +1,15 @@
 import time
+import os
 from binance.client import Client as BinanceClient
-import json
 from binance.exceptions import BinanceAPIException
 
+
 # Load configuration
-with open("./config.json", 'r') as f:
-    config = json.load(f)
+binance_api_key = os.environ['BINANCE_API_KEY']
+binance_api_secret = os.environ['BINANCE_API_SECRET']
 
 # Initialize Binance API client
-binance_client = BinanceClient(config["binance_api_key"], config["binance_api_secret"])
+binance_client = BinanceClient(binance_api_key, binance_api_secret)
 
 
 # Get klines data

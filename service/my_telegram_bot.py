@@ -2,13 +2,13 @@ from telegram import Update, ForceReply, bot, InlineKeyboardButton, InlineKeyboa
 from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackContext
 import json
 import atexit
+import os
 
 # Load configuration
-with open("./config.json", 'r') as f:
-    config = json.load(f)
+telegram_token = os.environ['TELEGRAM_TOKEN']
 
 # Initialize Telegram Bot
-updater = Updater(config["telegram_token"], use_context=True)
+updater = Updater(telegram_token, use_context=True)
 dispatcher = updater.dispatcher
 
 # Load subscribed chat ids from file (if it exists)
