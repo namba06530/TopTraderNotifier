@@ -82,31 +82,31 @@ def monitor_ma_crossover(pairs, interval, ma_func, ma_args, ema_args, dispatcher
                 # Compute the position of the last candle with respect to the MAs
                 # Check if last candle close is above or below MAs
                 last_position = get_ma_position(last_candle, last_mas[pair])
-                print(f"{datetime.fromtimestamp(last_candle['timestamp'] / 1000).strftime('%Y-%m-%d %H:%M:%S')}: "
-                      f"{pair} Last Position: {last_position}")
+                # print(f"{datetime.fromtimestamp(last_candle['timestamp'] / 1000).strftime('%Y-%m-%d %H:%M:%S')}: "
+                      # f"{pair} Last Position: {last_position}")
 
                 if last_position is None:
                     last_position = last_positions[pair]['ma_position']
-                    print(f"{datetime.fromtimestamp(last_candle['timestamp'] / 1000).strftime('%Y-%m-%d %H:%M:%S')}: "
-                          f"{pair} Last Position: {last_position}")
+                    # print(f"{datetime.fromtimestamp(last_candle['timestamp'] / 1000).strftime('%Y-%m-%d %H:%M:%S')}: "
+                          # f"{pair} Last Position: {last_position}")
 
                 if pair not in last_positions:
                     last_positions[pair] = {'ma_position': last_position, 'ema_position': None}
 
                 # Check if MA position has changed
                 if last_positions[pair]['ma_position'] != last_position:
-                    print(
-                        f"{datetime.fromtimestamp(last_candle['timestamp'] / 1000).strftime('%Y-%m-%d %H:%M:%S')}: "
-                        f"{pair} MA Position: Change from {last_positions[pair]['ma_position']} to {last_position}")
+                    # print(
+                        # f"{datetime.fromtimestamp(last_candle['timestamp'] / 1000).strftime('%Y-%m-%d %H:%M:%S')}: "
+                        # f"{pair} MA Position: Change from {last_positions[pair]['ma_position']} to {last_position}")
 
                     last_positions[pair]['ma_position'] = last_position
 
                     # Check if MAs are close to each other
                     ma_close = check_ma_conditions(pair, last_mas)
                     if ma_close:
-                        print(
-                            f"{datetime.fromtimestamp(last_candle['timestamp'] / 1000).strftime('%Y-%m-%d %H:%M:%S')}: "
-                            f"{pair} MAs Close = True")
+                        # print(
+                            # f"{datetime.fromtimestamp(last_candle['timestamp'] / 1000).strftime('%Y-%m-%d %H:%M:%S')}: "
+                            # f"{pair} MAs Close = True")
 
                         # Check EMA position
                         ema_close, ema_crossed, ema_position, ema_below_ma, ema_above_ma = check_ema_conditions(pair,
@@ -114,10 +114,10 @@ def monitor_ma_crossover(pairs, interval, ma_func, ma_args, ema_args, dispatcher
                                                                                                                 last_mas)
                         last_positions[pair]['ema_position'] = ema_position
 
-                        print(
-                            f"{datetime.fromtimestamp(last_candle['timestamp'] / 1000).strftime('%Y-%m-%d %H:%M:%S')}: "
-                            f"{pair} EMAs Close: {ema_close}, EMAs Crossed: {ema_crossed}, "
-                            f"EMAs Position: {ema_position}, EMAs Below: {ema_below_ma}, EMAs Above: {ema_above_ma}")
+                        # print(
+                            # f"{datetime.fromtimestamp(last_candle['timestamp'] / 1000).strftime('%Y-%m-%d %H:%M:%S')}: "
+                            # f"{pair} EMAs Close: {ema_close}, EMAs Crossed: {ema_crossed}, "
+                            # f"EMAs Position: {ema_position}, EMAs Below: {ema_below_ma}, EMAs Above: {ema_above_ma}")
 
                         if last_positions[pair]['ma_position'] == 'above' and macd_cross_above:
                             if ema_below_ma:
@@ -147,10 +147,10 @@ def monitor_ma_crossover(pairs, interval, ma_func, ma_args, ema_args, dispatcher
                                         print(Style.RESET_ALL)
                                         send_message_to_subscribed_users(dispatcher, sell_message)
 
-                    else:
-                        print(
-                            f"{datetime.fromtimestamp(last_candle['timestamp'] / 1000).strftime('%Y-%m-%d %H:%M:%S')}: "
-                            f"{pair} MAs Close = False")
+                    # else:
+                        # print(
+                            # f"{datetime.fromtimestamp(last_candle['timestamp'] / 1000).strftime('%Y-%m-%d %H:%M:%S')}: "
+                            # f"{pair} MAs Close = False")
 
                 last_message = general_message(pair, last_candles, "Last Candle")
                 print(last_message)
