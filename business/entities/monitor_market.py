@@ -126,11 +126,12 @@ def monitor_ma_crossover(pairs, interval, ma_func, ma_args, ema_args, dispatcher
                                     stop_loss = calculate_buy_stop_loss(ma1, ma2, ema1, ema2, lows)
                                     tp1 = calculate_buy_tp1(entry_price, stop_loss)
                                     tp2 = calculate_buy_tp2(closes, period=130, std_dev=2)
-                                    buy_message = signal_message(pair, 'buy', last_candle, entry_price,
-                                                                 stop_loss, tp1, tp2)
-                                    print(Fore.GREEN + buy_message)
-                                    print(Style.RESET_ALL)
-                                    send_message_to_subscribed_users(dispatcher, buy_message)
+                                    if stop_loss is not None:
+                                        buy_message = signal_message(pair, 'buy', last_candle, entry_price,
+                                                                     stop_loss, tp1, tp2)
+                                        print(Fore.GREEN + buy_message)
+                                        print(Style.RESET_ALL)
+                                        send_message_to_subscribed_users(dispatcher, buy_message)
 
                         if last_positions[pair]['ma_position'] == 'below' and macd_cross_below:
                             if ema_above_ma:
@@ -139,11 +140,12 @@ def monitor_ma_crossover(pairs, interval, ma_func, ma_args, ema_args, dispatcher
                                     stop_loss = calculate_sell_stop_loss(ma1, ma2, ema1, ema2, highs)
                                     tp1 = calculate_sell_tp1(entry_price, stop_loss)
                                     tp2 = calculate_sell_tp2(closes, period=130, std_dev=2)
-                                    sell_message = signal_message(pair, 'sell', last_candle, entry_price,
-                                                                  stop_loss, tp1, tp2)
-                                    print(Fore.RED + sell_message)
-                                    print(Style.RESET_ALL)
-                                    send_message_to_subscribed_users(dispatcher, sell_message)
+                                    if stop_loss is not None:
+                                        sell_message = signal_message(pair, 'sell', last_candle, entry_price,
+                                                                      stop_loss, tp1, tp2)
+                                        print(Fore.RED + sell_message)
+                                        print(Style.RESET_ALL)
+                                        send_message_to_subscribed_users(dispatcher, sell_message)
 
                     else:
                         print(
