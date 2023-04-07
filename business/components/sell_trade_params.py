@@ -1,3 +1,5 @@
+import numpy as np
+
 from common.bb_utils import calculate_bollinger_bands
 
 
@@ -18,7 +20,7 @@ def calculate_sell_entry_price(last_ma1, last_ma2, last_candle):
     return entry_price
 
 
-def calculate_sell_stop_loss(ma1, ma2, ema1, ema2, highs):
+"""def calculate_sell_stop_loss(ma1, ma2, ema1, ema2, highs):
     # Find the index of the last candle where high is above all MAs and EMAs
     last_candle_above_mas_emas = -1
     for i in range(len(highs) - 1, -1, -1):  # We start from the last element (the most recent candle)
@@ -35,6 +37,30 @@ def calculate_sell_stop_loss(ma1, ma2, ema1, ema2, highs):
     # Set the stop loss slightly above the last point above the MAs and EMAs
     stop_loss = stop_loss + (stop_loss * 0.005)
 
+    return stop_loss"""
+
+
+def calculate_sell_stop_loss(highs, close_prices, bollinger_period=130, bollinger_std_dev=2):
+    # Calculate Bollinger Bands
+    upper_band, middle_band, lower_band = calculate_bollinger_bands(close_prices, period=bollinger_period,
+                                                                    std_dev=bollinger_std_dev)
+
+    # Take the last 12 candles
+    last_12_highs = highs[-12:]
+
+    # Find the highest point of the last 12 candles
+    highest_point = np.max(last_12_highs)
+
+    # Set the stop loss slightly above the highest point
+    stop_loss = highest_point + (highest_point * 0.005)
+
+    # Check if the stop loss is within the Bollinger Bands
+    last_upper_band = upper_band[-1]
+    if stop_loss > last_upper_band:
+        stop_loss = last_upper_band
+    else:
+        stop_loss = None
+
     return stop_loss
 
 
@@ -43,7 +69,8 @@ def calculate_sell_tp1(entry_price, stop_loss):
     return tp1_sell_signal
 
 
-def calculate_sell_tp2(close_prices, period, std_dev):
-    upper_band, middle_band, lower_band = calculate_bollinger_bands(close_prices, period=period, std_dev=std_dev)
+def calculate_sell_tp2(close_prices, bollinger_period=130, bollinger_std_dev=2):
+    upper_band, middle_band, lower_band = calculate_bollinger_bands(close_prices, period=bollinger_period,
+                                                                    std_dev=bollinger_std_dev)
     tp2_sell_signal = lower_band[-1]
     return tp2_sell_signal

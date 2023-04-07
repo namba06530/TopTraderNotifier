@@ -123,9 +123,9 @@ def monitor_ma_crossover(pairs, interval, ma_func, ma_args, ema_args, dispatcher
                             if ema_below_ma:
                                 if ema_close or ema_crossed:
                                     entry_price = calculate_buy_entry_price(last_ma1, last_ma2, last_candle)
-                                    stop_loss = calculate_buy_stop_loss(ma1, ma2, ema1, ema2, lows)
+                                    stop_loss = calculate_buy_stop_loss(lows, closes)
                                     tp1 = calculate_buy_tp1(entry_price, stop_loss)
-                                    tp2 = calculate_buy_tp2(closes, period=130, std_dev=2)
+                                    tp2 = calculate_buy_tp2(closes)
                                     if stop_loss is not None:
                                         buy_message = signal_message(pair, 'buy', last_candle, entry_price,
                                                                      stop_loss, tp1, tp2)
@@ -137,9 +137,9 @@ def monitor_ma_crossover(pairs, interval, ma_func, ma_args, ema_args, dispatcher
                             if ema_above_ma:
                                 if ema_close or ema_crossed:
                                     entry_price = calculate_sell_entry_price(last_ma1, last_ma2, last_candle)
-                                    stop_loss = calculate_sell_stop_loss(ma1, ma2, ema1, ema2, highs)
+                                    stop_loss = calculate_sell_stop_loss(highs, closes)
                                     tp1 = calculate_sell_tp1(entry_price, stop_loss)
-                                    tp2 = calculate_sell_tp2(closes, period=130, std_dev=2)
+                                    tp2 = calculate_sell_tp2(closes)
                                     if stop_loss is not None:
                                         sell_message = signal_message(pair, 'sell', last_candle, entry_price,
                                                                       stop_loss, tp1, tp2)
