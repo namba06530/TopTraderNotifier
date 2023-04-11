@@ -13,7 +13,7 @@ dispatcher = updater.dispatcher
 
 # Load subscribed chat ids from file (if it exists)
 try:
-    with open('./common/subscribed_chat_ids.json', 'r') as f:
+    with open('./subscribed_chat_ids.json', 'r') as f:
         subscribed_chat_ids = set(json.load(f))
 except FileNotFoundError:
     subscribed_chat_ids = set()
@@ -22,7 +22,7 @@ except FileNotFoundError:
 # Save subscribed chat ids to file on exit
 @atexit.register
 def save_subscribed_chat_ids():
-    with open('./common/subscribed_chat_ids.json', 'w') as f:
+    with open('./subscribed_chat_ids.json', 'w') as f:
         json.dump(list(subscribed_chat_ids), f)
 
 
@@ -43,7 +43,7 @@ def subscribe(update: Update, context: CallbackContext) -> None:
     else:
         subscribed_chat_ids.add(chat_id)
         update.message.reply_text("Thank you for subscribing to TopTraderNotifier !\n\n"
-                                  "You will now receive notifications of important market evants.")
+                                  "You will now receive notifications of important market events.")
 
 
 def unsubscribe(update: Update, context: CallbackContext) -> None:

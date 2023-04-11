@@ -1,7 +1,7 @@
 import time
 
 from common.macd_utils import calculate_macd
-from service.my_telegram_bot import *
+from service.my_telegram_bot import send_message_to_subscribed_users
 from common.utils import interval_to_seconds
 from common.ma_utils import get_ma_position, update_ma_ema_positions, get_last_candle_and_ma, check_ema_conditions, \
     check_ma_conditions
@@ -12,6 +12,8 @@ from business.components.sell_trade_params import calculate_sell_entry_price, ca
     calculate_sell_tp1, calculate_sell_tp2
 from datetime import datetime
 from colorama import Fore, Style
+from data.bybit_api import create_bybit_session
+from business.entities.bybit_order import place_order, calculate_order_quantity
 
 
 def monitor_ma_crossover(pairs, interval, ma_func, ma_args, ema_args, dispatcher):
@@ -83,12 +85,12 @@ def monitor_ma_crossover(pairs, interval, ma_func, ma_args, ema_args, dispatcher
                 # Check if last candle close is above or below MAs
                 last_position = get_ma_position(last_candle, last_mas[pair])
                 # print(f"{datetime.fromtimestamp(last_candle['timestamp'] / 1000).strftime('%Y-%m-%d %H:%M:%S')}: "
-                      # f"{pair} Last Position: {last_position}")
+                # f"{pair} Last Position: {last_position}")
 
                 if last_position is None:
                     last_position = last_positions[pair]['ma_position']
                     # print(f"{datetime.fromtimestamp(last_candle['timestamp'] / 1000).strftime('%Y-%m-%d %H:%M:%S')}: "
-                          # f"{pair} Last Position: {last_position}")
+                    # f"{pair} Last Position: {last_position}")
 
                 if pair not in last_positions:
                     last_positions[pair] = {'ma_position': last_position, 'ema_position': None}
@@ -96,8 +98,8 @@ def monitor_ma_crossover(pairs, interval, ma_func, ma_args, ema_args, dispatcher
                 # Check if MA position has changed
                 if last_positions[pair]['ma_position'] != last_position:
                     # print(
-                        # f"{datetime.fromtimestamp(last_candle['timestamp'] / 1000).strftime('%Y-%m-%d %H:%M:%S')}: "
-                        # f"{pair} MA Position: Change from {last_positions[pair]['ma_position']} to {last_position}")
+                    # f"{datetime.fromtimestamp(last_candle['timestamp'] / 1000).strftime('%Y-%m-%d %H:%M:%S')}: "
+                    # f"{pair} MA Position: Change from {last_positions[pair]['ma_position']} to {last_position}")
 
                     last_positions[pair]['ma_position'] = last_position
 
@@ -105,8 +107,8 @@ def monitor_ma_crossover(pairs, interval, ma_func, ma_args, ema_args, dispatcher
                     ma_close = check_ma_conditions(pair, last_mas)
                     if ma_close:
                         # print(
-                            # f"{datetime.fromtimestamp(last_candle['timestamp'] / 1000).strftime('%Y-%m-%d %H:%M:%S')}: "
-                            # f"{pair} MAs Close = True")
+                        # f"{datetime.fromtimestamp(last_candle['timestamp'] / 1000).strftime('%Y-%m-%d %H:%M:%S')}: "
+                        # f"{pair} MAs Close = True")
 
                         # Check EMA position
                         ema_close, ema_crossed, ema_position, ema_below_ma, ema_above_ma = check_ema_conditions(pair,
@@ -115,9 +117,9 @@ def monitor_ma_crossover(pairs, interval, ma_func, ma_args, ema_args, dispatcher
                         last_positions[pair]['ema_position'] = ema_position
 
                         # print(
-                            # f"{datetime.fromtimestamp(last_candle['timestamp'] / 1000).strftime('%Y-%m-%d %H:%M:%S')}: "
-                            # f"{pair} EMAs Close: {ema_close}, EMAs Crossed: {ema_crossed}, "
-                            # f"EMAs Position: {ema_position}, EMAs Below: {ema_below_ma}, EMAs Above: {ema_above_ma}")
+                        # f"{datetime.fromtimestamp(last_candle['timestamp'] / 1000).strftime('%Y-%m-%d %H:%M:%S')}: "
+                        # f"{pair} EMAs Close: {ema_close}, EMAs Crossed: {ema_crossed}, "
+                        # f"EMAs Position: {ema_position}, EMAs Below: {ema_below_ma}, EMAs Above: {ema_above_ma}")
 
                         if last_positions[pair]['ma_position'] == 'above' and macd_cross_above:
                             if ema_below_ma:
@@ -133,6 +135,14 @@ def monitor_ma_crossover(pairs, interval, ma_func, ma_args, ema_args, dispatcher
                                         print(Style.RESET_ALL)
                                         send_message_to_subscribed_users(dispatcher, buy_message)
 
+                                        # Place the buy order with stop loss and take profits
+                                        session = create_bybit_session()
+                                        qty = calculate_order_quantity(session)
+                                        entry_order, stop_order, tp_orders = place_order(session, pair, 'Buy', qty,
+                                                                                         entry_price, stop_loss, tp1,
+                                                                                         tp2, interval)
+                                        print("Order placed:", entry_order)
+
                         if last_positions[pair]['ma_position'] == 'below' and macd_cross_below:
                             if ema_above_ma:
                                 if ema_close or ema_crossed:
@@ -147,13 +157,21 @@ def monitor_ma_crossover(pairs, interval, ma_func, ma_args, ema_args, dispatcher
                                         print(Style.RESET_ALL)
                                         send_message_to_subscribed_users(dispatcher, sell_message)
 
-                    # else:
-                        # print(
-                            # f"{datetime.fromtimestamp(last_candle['timestamp'] / 1000).strftime('%Y-%m-%d %H:%M:%S')}: "
-                            # f"{pair} MAs Close = False")
+                                        # Place the sell order with stop loss and take profits
+                                        session = create_bybit_session()
+                                        qty = calculate_order_quantity(session)
+                                        entry_order, stop_order, tp_orders = place_order(session, pair, 'Sell', qty,
+                                                                                         entry_price, stop_loss, tp1,
+                                                                                         tp2, interval)
+                                        print("Order placed:", entry_order)
 
-                last_message = general_message(pair, last_candles, "Last Candle")
-                print(last_message)
+                    # else:
+                    # print(
+                    # f"{datetime.fromtimestamp(last_candle['timestamp'] / 1000).strftime('%Y-%m-%d %H:%M:%S')}: "
+                    # f"{pair} MAs Close = False")
+
+                # last_message = general_message(pair, last_candles, "Last Candle")
+                # print(last_message)
 
         # Wait until the end of the candle
         time_to_wait = seconds - (time.time() % seconds) + 10

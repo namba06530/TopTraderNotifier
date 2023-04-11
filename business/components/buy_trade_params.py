@@ -51,7 +51,7 @@ def calculate_buy_stop_loss(lows, close_prices, bollinger_period=130, bollinger_
     lowest_point = np.min(last_12_lows)
 
     # Set the stop loss slightly below the lowest point
-    stop_loss = lowest_point - (lowest_point * 0.005)
+    stop_loss = lowest_point - (lowest_point * 0.001)
 
     # Check if the stop loss is within the Bollinger Bands
     last_lower_band = lower_band[-1]

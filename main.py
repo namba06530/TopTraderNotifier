@@ -10,7 +10,7 @@ now = datetime.now()
 
 # Set SSL verification
 httpClient = requests.Session()
-httpClient.verify = False
+httpClient.verify = True
 
 # Load configuration
 with open("./config.json", 'r') as f:

@@ -1,43 +1,19 @@
-import requests
-import time
-import hmac
-import hashlib
+from pybit.usdt_perpetual import HTTP
 import os
 
-# Load configuration
-bybit_fictif_api_key = os.environ['BYBIT_FICTIF_API_KEY']
-bybit_fictif_api_secret = os.environ['BYBIT_FICTIF_API_SECRET']
 
-api_key = bybit_fictif_api_key
-api_secret = bybit_fictif_api_secret
+def create_bybit_session(testnet=True):
+    # Load configuration
+    bybit_testnet_api_key = os.environ['BYBIT_TESTNET_API_KEY']
+    bybit_testnet_api_secret = os.environ['BYBIT_TESTNET_API_SECRET']
 
-httpClient = requests.Session()
-recv_window = str(5000)
-url = "https://api-testnet.bybit.com"  # Testnet endpoint
+    API_KEY = bybit_testnet_api_key
+    API_SECRET = bybit_testnet_api_secret
+    TESTNET = 'https://api-testnet.bybit.com'
+    MAINNET = 'https://api.bybit.com'
 
+    endpoint = TESTNET if testnet else MAINNET
 
-def HTTP_Request(endPoint, method, payload, Info):
-    global time_stamp
-    time_stamp = str(int(time.time() * 10 ** 3))
-    signature = genSignature(payload)
-    headers = {
-        'X-BAPI-API-KEY': api_key,
-        'X-BAPI-SIGN': signature,
-        'X-BAPI-SIGN-TYPE': '2',
-        'X-BAPI-TIMESTAMP': time_stamp,
-        'X-BAPI-RECV-WINDOW': recv_window,
-        'Content-Type': 'application/json'
-    }
-    if method == "POST":
-        response = httpClient.request(method, url + endPoint, headers=headers, data=payload)
-    else:
-        response = httpClient.request(method, url + endPoint + "?" + payload, headers=headers)
-    print(response.text)
-    print(Info + " Response Time : " + str(response.elapsed))
+    session = HTTP(endpoint=endpoint, api_key=API_KEY, api_secret=API_SECRET)
+    return session
 
-
-def genSignature(payload):
-    param_str = str(time_stamp) + api_key + recv_window + payload
-    hash = hmac.new(bytes(api_secret, "utf-8"), param_str.encode("utf-8"), hashlib.sha256)
-    signature = hash.hexdigest()
-    return signature

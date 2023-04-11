@@ -52,7 +52,7 @@ def calculate_sell_stop_loss(highs, close_prices, bollinger_period=130, bollinge
     highest_point = np.max(last_12_highs)
 
     # Set the stop loss slightly above the highest point
-    stop_loss = highest_point + (highest_point * 0.005)
+    stop_loss = highest_point + (highest_point * 0.001)
 
     # Check if the stop loss is within the Bollinger Bands
     last_upper_band = upper_band[-1]

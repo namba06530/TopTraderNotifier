@@ -15,7 +15,8 @@ binance_client = BinanceClient(binance_api_key, binance_api_secret)
 # Get klines data
 def get_klines_data(symbol, interval, retry_on_error=True):
     try:
-        client = binance_client.get_klines(symbol=symbol, interval=interval)
+        #client = binance_client.get_klines(symbol=symbol, interval=interval)
+        client = binance_client.futures_klines(symbol=symbol, interval=interval)
     except BinanceAPIException as e:
         print(f"Error: {e}")
         if retry_on_error:
