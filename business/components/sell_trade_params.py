@@ -65,6 +65,8 @@ def calculate_sell_stop_loss(highs, close_prices, bollinger_period=130, bollinge
 
 
 def calculate_sell_tp1(entry_price, stop_loss):
+    if stop_loss is None:
+        return None
     tp1_sell_signal = entry_price - (stop_loss - entry_price)
     return tp1_sell_signal
 

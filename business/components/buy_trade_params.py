@@ -64,6 +64,8 @@ def calculate_buy_stop_loss(lows, close_prices, bollinger_period=130, bollinger_
 
 
 def calculate_buy_tp1(entry_price, stop_loss):
+    if stop_loss is None:
+        return None
     tp1_buy_signal = entry_price + (entry_price - stop_loss)
     return tp1_buy_signal
 

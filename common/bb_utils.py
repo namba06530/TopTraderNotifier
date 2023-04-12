@@ -9,3 +9,7 @@ def calculate_bollinger_bands(close_prices, period=130, std_dev=2):
 
 def calculate_bollinger_band_width(upper_band, lower_band):
     return upper_band - lower_band
+
+
+def calculate_bollinger_band_relative_width(upper_band, lower_band, middle_band):
+    return (upper_band - lower_band) / middle_band
