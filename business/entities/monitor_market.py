@@ -18,7 +18,7 @@ from data.bybit_api import create_bybit_session
 from business.entities.bybit_order import place_order, calculate_order_quantity
 
 
-def monitor_ma_crossover(pairs, interval, ma_func, ma_args, ema_args):
+def monitor_ma_crossover(pairs, interval, ma_func, ma_args, ema_args, dispatcher):
     # Convert interval to seconds
     seconds = interval_to_seconds(interval)
 
@@ -159,7 +159,7 @@ def monitor_ma_crossover(pairs, interval, ma_func, ma_args, ema_args):
                                                                              stop_loss, tp1, tp2)
                                                 print(Fore.GREEN + buy_message)
                                                 print(Style.RESET_ALL)
-                                                # send_message_to_subscribed_users(dispatcher, buy_message)
+                                                send_message_to_subscribed_users(dispatcher, buy_message)
 
                                                 # Place the buy order with stop loss and take profits
                                                 session = create_bybit_session()
@@ -182,7 +182,7 @@ def monitor_ma_crossover(pairs, interval, ma_func, ma_args, ema_args):
                                                                               stop_loss, tp1, tp2)
                                                 print(Fore.RED + sell_message)
                                                 print(Style.RESET_ALL)
-                                                # send_message_to_subscribed_users(dispatcher, sell_message)
+                                                send_message_to_subscribed_users(dispatcher, sell_message)
 
                                                 # Place the sell order with stop loss and take profits
                                                 session = create_bybit_session()
