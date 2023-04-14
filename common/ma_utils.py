@@ -27,7 +27,7 @@ def calculate_ma(closes, ma_func, ma_args, ema_args):
 
     last_mas = {'ma1': last_ma1, 'ma2': last_ma2}
 
-    return start_ma1, start_ma2, start_ema1, start_ema2, last_ma1, last_ma2, last_ema1, last_ema2, prev_ema1, prev_ema2,\
+    return start_ma1, start_ma2, start_ema1, start_ema2, last_ma1, last_ma2, last_ema1, last_ema2, prev_ema1, prev_ema2, \
         ma1, ma2, ema1, ema2
 
 
@@ -74,12 +74,12 @@ def update_ma_ema_positions(pair, interval, ma_func, ma_args, ema_args, last_pos
 def check_ema_conditions(pair, last_emas, last_mas):
     ema_position = None
     # Check if EMAs are close to each other
-    if abs((last_emas[pair]['ema1'] - last_emas[pair]['ema2']) / last_emas[pair]['ema1']) <= 0.0005 or \
-            abs((last_emas[pair]['ema2'] - last_emas[pair]['ema1']) / last_emas[pair]['ema2']) <= 0.0005:
+    if abs((last_emas[pair]['ema1'] - last_emas[pair]['ema2']) / last_emas[pair]['ema1']) <= 0.005 or \
+            abs((last_emas[pair]['ema2'] - last_emas[pair]['ema1']) / last_emas[pair]['ema2']) <= 0.005:
         ema_close = True
         ema_position = 'close'
     else:
-        ema_close = None
+        ema_close = False
 
     # Check if EMAs have crossed
     if last_emas[pair]['ema1'] > last_emas[pair]['ema2'] and last_emas[pair]['ema1_prev'] <= last_emas[pair][
@@ -109,12 +109,21 @@ def check_ema_conditions(pair, last_emas, last_mas):
 
 
 def check_ma_conditions(pair, last_mas):
+    ma1 = last_mas[pair]['ma1']
+    ma2 = last_mas[pair]['ma2']
+    # print(f"{pair} MA1: {ma1}, MA2: {ma2}")
+
+    ma_diff_1 = abs((ma1 - ma2) / ma1)
+    ma_diff_2 = abs((ma2 - ma1) / ma2)
+    # print(f"{pair} MA Difference Ratios: {ma_diff_1}, {ma_diff_2}")
+
     # Check if MAs are close to each other
-    if abs((last_mas[pair]['ma1'] - last_mas[pair]['ma2']) / last_mas[pair]['ma1']) <= 0.0005 or \
-            abs((last_mas[pair]['ma2'] - last_mas[pair]['ma1']) / last_mas[pair]['ma2']) <= 0.0005:
+    if ma_diff_1 <= 0.005 or ma_diff_2 <= 0.005:
         ma_close = True
     else:
-        ma_close = None
+        ma_close = False
+
+    # print(f"{pair} MAs Close: {ma_close}")
     return ma_close
 
 
