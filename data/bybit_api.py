@@ -1,6 +1,5 @@
-# from pybit.unified_trading import HTTP
+from pybit.unified_trading import HTTP
 import os
-import bybit
 
 
 def create_bybit_session():
@@ -13,8 +12,15 @@ def create_bybit_session():
     TESTNET = True
 
     if TESTNET:
-        session = bybit.bybit(test=True, api_key=API_KEY, api_secret=API_SECRET)
+        session = HTTP(
+            testnet=True,
+            api_key=API_KEY,
+            api_secret=API_SECRET
+        )
     else:
-        session = bybit.bybit(test=False, api_key=API_KEY, api_secret=API_SECRET)
+        session = HTTP(
+            testnet=False,
+            api_key=API_KEY,
+            api_secret=API_SECRET
+        )
     return session
-

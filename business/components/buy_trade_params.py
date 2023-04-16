@@ -56,8 +56,6 @@ def calculate_buy_stop_loss(lows, close_prices, bollinger_period=130, bollinger_
     # Check if the stop loss is within the Bollinger Bands
     last_lower_band = lower_band[-1]
     if stop_loss < last_lower_band:
-        stop_loss = last_lower_band
-    else:
         stop_loss = None
 
     return stop_loss

@@ -4,7 +4,7 @@ from common.bb_utils import calculate_bollinger_bands, calculate_bollinger_band_
 from common.macd_utils import calculate_macd
 from service.my_telegram_bot import send_message_to_subscribed_users
 from common.utils import interval_to_seconds
-from common.ma_utils import get_ma_position, update_ma_ema_positions, get_last_candle_and_ma, check_ema_conditions, \
+from common.ma_utils import get_ma_position, get_last_candle_and_ma, check_ema_conditions, \
     check_ma_conditions
 from common.messages_utils import signal_message, general_message
 from business.components.buy_trade_params import calculate_buy_entry_price, calculate_buy_stop_loss, calculate_buy_tp1, \
@@ -73,16 +73,17 @@ def monitor_ma_crossover(pairs, interval, ma_func, ma_args, ema_args, dispatcher
                 macd, macd_signal, macd_hist = calculate_macd(closes)
 
                 lookback_period = 5
+                macd_slope_threshold = 0.01
 
                 # Calculate the slope of the MACD line
                 macd_slope = macd[-1] - macd[-lookback_period]
-                macd_slope_positive = macd_slope > 0
-                macd_slope_negative = macd_slope < 0
+                macd_slope_positive = macd_slope > macd_slope_threshold
+                macd_slope_negative = macd_slope < -macd_slope_threshold
 
                 # Calculate the slope of the MACD signal line
                 macd_signal_slope = macd_signal[-1] - macd_signal[-lookback_period]
-                macd_signal_slope_positive = macd_signal_slope > 0
-                macd_signal_slope_negative = macd_signal_slope < 0
+                macd_signal_slope_positive = macd_signal_slope > macd_slope_threshold
+                macd_signal_slope_negative = macd_signal_slope < -macd_slope_threshold
 
                 # Check if MACD conditions are met within the last 5 candles
                 macd_cross_above = any(
@@ -113,7 +114,8 @@ def monitor_ma_crossover(pairs, interval, ma_func, ma_args, ema_args, dispatcher
                     last_positions[pair] = {'ma_position': last_position, 'ema_position': None}
 
                 # Check if MA position has changed
-                if last_positions[pair]['ma_position'] != last_position and last_positions[pair]['ma_position'] is not None:
+                if last_positions[pair]['ma_position'] != last_position and last_positions[pair][
+                    'ma_position'] is not None:
                     timestamp = datetime.fromtimestamp(last_candle['timestamp'] / 1000).strftime('%Y-%m-%d %H:%M:%S')
                     print(
                         f"{timestamp} {pair} MA Position: Change from {last_positions[pair]['ma_position']} to {last_position}")
@@ -139,11 +141,11 @@ def monitor_ma_crossover(pairs, interval, ma_func, ma_args, ema_args, dispatcher
                                 last_mas)
                             last_positions[pair]['ema_position'] = ema_position
 
-                            print(f"{timestamp} {pair} EMAs Position: {ema_position} EMAs Close: {ema_close} EMAs "
-                                  f"Crossed: {ema_crossed} EMAs Above MAs: {ema_above_ma} EMAs Below MAs: {ema_below_ma}")
+                            print(f"{timestamp} {pair} EMAs Close: {ema_close} EMAs Crossed: {ema_crossed} "
+                                  f"EMAs Above MAs: {ema_above_ma} EMAs Below MAs: {ema_below_ma}")
 
-                            if last_positions[pair][
-                                'ma_position'] == 'above' and macd_cross_above and macd_slope_positive and macd_signal_slope_positive:
+                            if last_positions[pair]['ma_position'] == 'above' and macd_cross_above and \
+                                    macd_slope_positive and macd_signal_slope_positive:
 
                                 print(f"{timestamp} {pair} MAs Position: {last_positions[pair]['ma_position']} "
                                       f"MACD Cross Above: {macd_cross_above} MACD Slope Positive: {macd_slope_positive} "
@@ -182,8 +184,8 @@ def monitor_ma_crossover(pairs, interval, ma_func, ma_args, ema_args, dispatcher
                                                                                                  tp2, interval)
                                                 print("Order placed:", entry_order)
 
-                            if last_positions[pair][
-                                'ma_position'] == 'below' and macd_cross_below and not macd_slope_negative and not macd_signal_slope_negative:
+                            if last_positions[pair]['ma_position'] == 'below' and macd_cross_below \
+                                    and macd_slope_negative and macd_signal_slope_negative:
 
                                 print(f"{timestamp} {pair} MAs Position: {last_positions[pair]['ma_position']} "
                                       f"MACD Cross Below: {macd_cross_below} MACD Slope Negative: {macd_slope_negative} "

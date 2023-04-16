@@ -40,7 +40,7 @@ def get_ma_position(candle, mas):
         return 'below'
 
 
-def update_ma_ema_positions(pair, interval, ma_func, ma_args, ema_args, last_positions, last_candles, last_mas,
+"""def update_ma_ema_positions(pair, interval, ma_func, ma_args, ema_args, last_positions, last_candles, last_mas,
                             last_emas):
     start_candle, last_candle, opens, closes, highs, lows, start_ma1, start_ma2, start_ema1, start_ema2, last_ma1, last_ma2, last_ema1, \
         last_ema2, prev_ema1, prev_ema2 = get_last_candle_and_ma(pair, interval, ma_func, ma_args, ema_args)
@@ -68,7 +68,7 @@ def update_ma_ema_positions(pair, interval, ma_func, ma_args, ema_args, last_pos
         if pair not in last_positions:
             last_positions[pair] = {'ma_position': last_position, 'ema_position': None}
 
-    return last_positions, last_candles, last_mas, last_emas, last_position, last_candle
+    return last_positions, last_candles, last_mas, last_emas, last_position, last_candle"""
 
 
 def check_ema_conditions(pair, last_emas, last_mas):

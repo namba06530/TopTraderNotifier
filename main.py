@@ -12,10 +12,10 @@ from data.binance_api import get_usdt_perpetual_symbols, update_config_file, get
 
 
 def update_top_pairs():
-    top_50_volume_symbols = get_top_volume_symbols(interval, number_of_candles, top_pairs)
-    update_config_file(config_file, top_50_volume_symbols)
+    top_volume_symbols = get_top_volume_symbols(interval, number_of_candles, top_pairs)
+    update_config_file(config_file, top_volume_symbols)
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    print(f"{timestamp}: Top 50 pairs updated")
+    print(f"{timestamp}: Top {top_pairs} pairs updated")
 
 
 config_file = "./config.json"
@@ -25,10 +25,8 @@ with open(config_file, 'r') as f:
 
 now = datetime.now()
 interval = "5m"
-top_pairs = 50
+top_pairs = 100
 number_of_candles = 12
-# List of trading pairs to monitor
-pairs_to_monitor = config['pairs_to_monitor']
 
 # Initialize TA-Lib
 ta_func = talib.SMA
@@ -43,15 +41,18 @@ httpClient.verify = True
 # binance_pairs = get_usdt_perpetual_symbols()
 
 # Load the top 50 pairs by volume from Binance
-top_50_volume_symbols = get_top_volume_symbols(interval, number_of_candles, top_pairs)
+top_volume_symbols = get_top_volume_symbols(interval, number_of_candles, top_pairs)
 
 # Update the configuration file
-update_config_file(config_file, top_50_volume_symbols)
+update_config_file(config_file, top_volume_symbols)
+
+# List of trading pairs to monitor
+pairs_to_monitor = config['pairs_to_monitor']
 
 if __name__ == '__main__':
 
     # Schedule the update of the top pairs every hour
-    schedule.every(1).hours.do(update_top_pairs)
+    schedule.every(4).hours.do(update_top_pairs)
 
     # Add command handlers
     dispatcher.add_handler(CommandHandler("start", start))
