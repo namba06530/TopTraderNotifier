@@ -64,7 +64,14 @@ def place_order(session, symbol, side, qty, entry_price, stop_loss, tp1, tp2, in
 
 def get_balance_usdt(session):
     balance_data = session.get_wallet_balance(accountType="UNIFIED", coin="USDT")
-    usdt_balance = float(balance_data["available_balance"])
+    coins = balance_data["list"][0]["coin"]
+
+    usdt_balance = 0
+    for coin in coins:
+        if coin["coin"] == "USDT":
+            usdt_balance = float(coin["walletBalance"])
+            break
+
     return usdt_balance
 
 

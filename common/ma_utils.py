@@ -31,12 +31,14 @@ def calculate_ma(closes, ma_func, ma_args, ema_args):
         ma1, ma2, ema1, ema2
 
 
-def get_ma_position(candle, mas):
-    if candle['close'] >= mas['ma1'] and candle['close'] >= mas['ma2'] or \
-            candle['close'] >= mas['ma2'] and candle['close'] >= mas['ma1']:
+def get_ma_position(candle, mas, margin_percent=0.1):
+    margin = candle['close'] * (margin_percent / 100)
+
+    if candle['close'] >= mas['ma1'] + margin and candle['close'] >= mas['ma2'] + margin or \
+            candle['close'] >= mas['ma2'] + margin and candle['close'] >= mas['ma1'] + margin:
         return 'above'
-    elif candle['close'] <= mas['ma1'] and candle['close'] <= mas['ma2'] or \
-            candle['close'] <= mas['ma2'] and candle['close'] <= mas['ma1']:
+    elif candle['close'] <= mas['ma1'] - margin and candle['close'] <= mas['ma2'] - margin or \
+            candle['close'] <= mas['ma2'] - margin and candle['close'] <= mas['ma1'] - margin:
         return 'below'
 
 
@@ -74,8 +76,8 @@ def get_ma_position(candle, mas):
 def check_ema_conditions(pair, last_emas, last_mas):
     ema_position = None
     # Check if EMAs are close to each other
-    if abs((last_emas[pair]['ema1'] - last_emas[pair]['ema2']) / last_emas[pair]['ema1']) <= 0.005 or \
-            abs((last_emas[pair]['ema2'] - last_emas[pair]['ema1']) / last_emas[pair]['ema2']) <= 0.005:
+    if abs((last_emas[pair]['ema1'] - last_emas[pair]['ema2']) / last_emas[pair]['ema1']) <= 0.003 or \
+            abs((last_emas[pair]['ema2'] - last_emas[pair]['ema1']) / last_emas[pair]['ema2']) <= 0.003:
         ema_close = True
         ema_position = 'close'
     else:
@@ -118,7 +120,7 @@ def check_ma_conditions(pair, last_mas):
     # print(f"{pair} MA Difference Ratios: {ma_diff_1}, {ma_diff_2}")
 
     # Check if MAs are close to each other
-    if ma_diff_1 <= 0.005 or ma_diff_2 <= 0.005:
+    if ma_diff_1 <= 0.003 or ma_diff_2 <= 0.003:
         ma_close = True
     else:
         ma_close = False
